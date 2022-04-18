@@ -99,3 +99,9 @@ func AddResourceList(list, req, limit v1.ResourceList) {
 		}
 	}
 }
+
+// JobSuspended returns whether a Job is suspended while taking the feature
+// gate into account.
+func JobSuspended(runPolicy *apiv1.RunPolicy) bool {
+	return runPolicy.Suspend != nil && *runPolicy.Suspend
+}
