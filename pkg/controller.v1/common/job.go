@@ -260,17 +260,13 @@ func (jc *JobController) ReconcileJobs(
 			}
 
 			if !syncReplicas {
-				now := metav1.Now()
-				jobStatus.LastReconcileTime = &now
-
-				// Update job status here to trigger a new reconciliation
-				return jc.Controller.UpdateJobStatusInApiServer(job, &jobStatus)
+				return fmt.Errorf("wait until can syncReplicas")
 			}
 		}
 
 		// Diff current active pods/services with replicas.
 		for rtype, spec := range replicas {
-			err := jc.Controller.ReconcilePods(metaObject, &jobStatus, pods, rtype, spec, replicas)
+			err := jc.Controller.ReconcilePods(metaObject, &jobStatus, pods, rtype, spec, replicas, runPolicy)
 			if err != nil {
 				log.Warnf("ReconcilePods error %v", err)
 				return err
