@@ -297,7 +297,7 @@ func (jc *JobController) ReconcileJobs(
 
 		// Diff current active pods/services with replicas.
 		for rtype, spec := range replicas {
-			err := jc.Controller.ReconcilePods(metaObject, &jobStatus, pods, rtype, spec, replicas)
+			err := jc.Controller.ReconcilePods(metaObject, &jobStatus, pods, rtype, spec, replicas, runPolicy)
 			if err != nil {
 				log.Warnf("ReconcilePods error %v", err)
 				return err
@@ -325,7 +325,7 @@ func (jc *JobController) ReconcileJobs(
 }
 
 // ResetExpectations reset the expectation for creates and deletes of pod/service to zero.
-func (jc *JobController) ResetExpectations(jobKey string, replicas map[apiv1.ReplicaType]*apiv1.ReplicaSpec)  {
+func (jc *JobController) ResetExpectations(jobKey string, replicas map[apiv1.ReplicaType]*apiv1.ReplicaSpec) {
 	for rtype := range replicas {
 		rt := strings.ToLower(string(rtype))
 		expectationPodsKey := expectation.GenExpectationPodsKey(jobKey, rt)
@@ -337,7 +337,7 @@ func (jc *JobController) ResetExpectations(jobKey string, replicas map[apiv1.Rep
 
 // PastActiveDeadline checks if job has ActiveDeadlineSeconds field set and if it is exceeded.
 func (jc *JobController) PastActiveDeadline(runPolicy *apiv1.RunPolicy, jobStatus apiv1.JobStatus) bool {
-	if runPolicy.ActiveDeadlineSeconds == nil || jobStatus.StartTime == nil {
+	if runPolicy.ActiveDeadlineSeconds == nil || jobStatus.StartTime == nil || JobSuspended(runPolicy) {
 		return false
 	}
 	now := metav1.Now()
