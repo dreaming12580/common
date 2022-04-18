@@ -10,6 +10,7 @@ import (
 	apiv1 "github.com/kubeflow/common/pkg/apis/common/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	commonutil "github.com/kubeflow/common/pkg/controller.v1/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
@@ -64,7 +65,7 @@ func RecordAbnormalPods(activePods []*v1.Pod, object runtime.Object, recorder re
 
 // PastActiveDeadline checks if job has ActiveDeadlineSeconds field set and if it is exceeded.
 func PastActiveDeadline(runPolicy *apiv1.RunPolicy, jobStatus apiv1.JobStatus) bool {
-	if runPolicy.ActiveDeadlineSeconds == nil || jobStatus.StartTime == nil {
+	if runPolicy.ActiveDeadlineSeconds == nil || jobStatus.StartTime == nil || commonutil.JobSuspended(runPolicy) {
 		return false
 	}
 	now := metav1.Now()
