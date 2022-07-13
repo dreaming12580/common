@@ -19,9 +19,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
+	apiv1 "github.com/kubeflow/common/pkg/apis/common/v1"
 	log "github.com/sirupsen/logrus"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/code-generator/pkg/util"
 	_ "k8s.io/kube-openapi/pkg/common"
 )
@@ -74,4 +78,17 @@ func RandString(n int) string {
 	}
 
 	return string(b)
+}
+
+func VerifyServicesConfig(job metav1.Object, services []*v1.Service, rtype apiv1.ReplicaType, spec *apiv1.ReplicaSpec) error {
+	rt := strings.ToLower(string(rtype))
+	jobName := job.GetName()
+
+	n := jobName + "-" + strings.ToLower(rt) + "-" + "123"
+	serviceName := strings.Replace(n, "/", "-", -1)
+	if len(serviceName) >= 63 {
+		log.Warningf("JobName: %s, length: %d is too long", jobName, len(serviceName))
+		return fmt.Errorf("the Job: %s Name is too long", jobName)
+	}
+	return nil
 }
