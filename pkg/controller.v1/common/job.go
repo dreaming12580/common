@@ -80,8 +80,16 @@ func (jc *JobController) ReconcileJobs(
 	// 2. Reset expectations can avoid dirty data such as `expectedDeletion = -1`
 	//    (pod or service was deleted unexpectedly)
 	jc.ResetExpectations(jobKey, replicas)
-
 	log.Infof("Reconciling for job %s", metaObject.GetName())
+
+	if err := commonutil.VerifyJobConfig(metaObject); err != nil {
+		if err1 := commonutil.UpdateJobConditions(&jobStatus, apiv1.JobFailed, commonutil.JobFailedReason, err.Error()); err1 != nil {
+			log.Infof("Append job condition error: %v", err)
+			return err1
+		}
+		return jc.Controller.UpdateJobStatusInApiServer(job, &jobStatus)
+	}
+
 	pods, err := jc.Controller.GetPodsForJob(job)
 	if err != nil {
 		log.Warnf("GetPodsForJob error %v", err)
@@ -272,8 +280,16 @@ func (jc *JobController) ReconcileJobs(
 				return err
 			}
 
-			err = jc.Controller.ReconcileServices(metaObject, services, rtype, spec)
+			err = commonutil.VerifyServicesConfig(metaObject, services, rtype, spec)
+			if err != nil {
+				if err1 := commonutil.UpdateJobConditions(&jobStatus, apiv1.JobFailed, commonutil.JobFailedReason, err.Error()); err1 != nil {
+					log.Infof("Append job condition error: %v", err)
+					return err1
+				}
+				return jc.Controller.UpdateJobStatusInApiServer(job, &jobStatus)
+			}
 
+			err = jc.Controller.ReconcileServices(metaObject, services, rtype, spec)
 			if err != nil {
 				log.Warnf("ReconcileServices error %v", err)
 				return err
