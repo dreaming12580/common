@@ -109,10 +109,6 @@ func (jc *JobController) ReconcileJobs(
 			return err
 		}
 
-		if err := jc.CleanupJob(runPolicy, jobStatus, job); err != nil {
-			return err
-		}
-
 		if jc.Config.EnableGangScheduling {
 			jc.Recorder.Event(runtimeObject, v1.EventTypeNormal, "JobTerminated", "Job has been terminated. Deleting PodGroup")
 			if err := jc.DeletePodGroup(metaObject); err != nil {
@@ -123,6 +119,10 @@ func (jc *JobController) ReconcileJobs(
 			}
 		}
 
+		if err := jc.CleanupJob(runPolicy, jobStatus, job); err != nil {
+			return err
+		}
+		
 		// At this point the pods may have been deleted.
 		// 1) If the job succeeded, we manually set the replica status.
 		// 2) If any replicas are still active, set their status to succeeded.
@@ -339,7 +339,10 @@ func (jc *JobController) CleanupJob(runPolicy *apiv1.RunPolicy, jobStatus apiv1.
 		return nil
 	}
 	duration := time.Second * time.Duration(*ttl)
-	// todo: Is the jobStatus.CompletionTime maybe nil ?
+	if jobStatus.CompletionTime == nil {
+		return fmt.Errorf("job completion time is nil, cannot cleanup")
+	}
+
 	finishTime := jobStatus.CompletionTime
 	expireTime := finishTime.Add(duration)
 	if currentTime.After(expireTime) {
