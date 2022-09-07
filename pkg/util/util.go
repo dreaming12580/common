@@ -84,11 +84,13 @@ func VerifyServicesConfig(job metav1.Object, services []*v1.Service, rtype apiv1
 	rt := strings.ToLower(string(rtype))
 	jobName := job.GetName()
 
-	n := jobName + "-" + strings.ToLower(rt) + "-" + "123"
+	n := jobName + "-" + strings.ToLower(rt) + "-" + "01"
 	serviceName := strings.Replace(n, "/", "-", -1)
 	if len(serviceName) > 63 {
-		log.Warningf("JobName: %s, length: %d is too long", jobName, len(serviceName))
-		return fmt.Errorf("the Job: %s Name is too long", jobName)
+		// 53 is very conservative value, Because K8s resource obeject metedata.name has Limit of length 63
+		// 63 minus length of replica type and job index, remaining length is going to be about 53
+		log.Warningf("JobName: %s, length is: %d, should not be greater than 53", jobName, len(jobName))
+		return fmt.Errorf("JobName: %s length is: %d, should not be greater than 53", jobName, len(jobName))
 	}
 	return nil
 }
@@ -96,11 +98,11 @@ func VerifyServicesConfig(job metav1.Object, services []*v1.Service, rtype apiv1
 func VerifyJobConfig(job metav1.Object) error {
 	jobName := job.GetName()
 
-	// 52 is very conservative value, Because K8s resource obeject metedata.name has Limit of length 63
-	// 63 minus length of replica type and job index, remaining length is going to be about 52
-	if len(jobName) > 52 {
-		log.Warningf("JobName: %s, length: %d is too long", jobName, len(jobName))
-		return fmt.Errorf("the Job: %s Name is too long", jobName)
+	//jobName will be setted in pod labels field
+	//values in the labels field must be no more than 63 characters
+	if len(jobName) > 63 {
+		log.Warningf("JobName: %s, length is: %d, should not be greater than 63", jobName, len(jobName))
+		return fmt.Errorf("JobName: %s, length is: %d, should not be greater than 63", jobName, len(jobName))
 	}
 	return nil
 }
