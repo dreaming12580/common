@@ -23,26 +23,26 @@ import (
 // JobStatus represents the current observed state of the training Job.
 type JobStatus struct {
 	// Conditions is an array of current observed job conditions.
-	Conditions []JobCondition `json:"conditions"`
+	Conditions []JobCondition `json:"conditions" protobuf:"bytes,1,rep,name=conditions"`
 
 	// ReplicaStatuses is map of ReplicaType and ReplicaStatus,
 	// specifies the status of each replica.
-	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses"`
+	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses" protobuf:"bytes,2,rep,name=replicaStatuses"`
 
 	// Represents time when the job was acknowledged by the job controller.
 	// It is not guaranteed to be set in happens-before order across separate operations.
 	// It is represented in RFC3339 form and is in UTC.
-	StartTime *metav1.Time `json:"startTime,omitempty"`
+	StartTime *metav1.Time `json:"startTime,omitempty" protobuf:"bytes,3,opt,name=startTime"`
 
 	// Represents time when the job was completed. It is not guaranteed to
 	// be set in happens-before order across separate operations.
 	// It is represented in RFC3339 form and is in UTC.
-	CompletionTime *metav1.Time `json:"completionTime,omitempty"`
+	CompletionTime *metav1.Time `json:"completionTime,omitempty" protobuf:"bytes,4,opt,name=completionTime"`
 
 	// Represents last time when the job was reconciled. It is not guaranteed to
 	// be set in happens-before order across separate operations.
 	// It is represented in RFC3339 form and is in UTC.
-	LastReconcileTime *metav1.Time `json:"lastReconcileTime,omitempty"`
+	LastReconcileTime *metav1.Time `json:"lastReconcileTime,omitempty" protobuf:"bytes,5,opt,name=lastReconcileTime"`
 }
 
 // +k8s:openapi-gen=true
@@ -54,18 +54,18 @@ type ReplicaType string
 // ReplicaStatus represents the current observed state of the replica.
 type ReplicaStatus struct {
 	// The number of actively running pods.
-	Active int32 `json:"active,omitempty"`
+	Active int32 `json:"active,omitempty" protobuf:"varint,1,opt,name=active"`
 
 	// The number of pods which reached phase Succeeded.
-	Succeeded int32 `json:"succeeded,omitempty"`
+	Succeeded int32 `json:"succeeded,omitempty" protobuf:"varint,2,opt,name=succeed"`
 
 	// The number of pods which reached phase Failed.
-	Failed int32 `json:"failed,omitempty"`
+	Failed int32 `json:"failed,omitempty" protobuf:"varint,3,opt,name=failed"`
 
 	// A label selector is a label query over a set of resources. The result of matchLabels and
 	// matchExpressions are ANDed. An empty label selector matches all objects. A null
 	// label selector matches no objects.
-	LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty"`
+	LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty" protobuf:"bytes,4,opt,name=labelSelector"`
 }
 
 // +k8s:openapi-gen=true
@@ -74,17 +74,17 @@ type ReplicaStatus struct {
 type ReplicaSpec struct {
 	// Replicas is the desired number of replicas of the given template.
 	// If unspecified, defaults to 1.
-	Replicas *int32 `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty" protobuf:"bytes,1,opt,name=replicas"`
 
 	// Template is the object that describes the pod that
 	// will be created for this replica. RestartPolicy in PodTemplateSpec
 	// will be overide by RestartPolicy in ReplicaSpec
-	Template v1.PodTemplateSpec `json:"template,omitempty"`
+	Template v1.PodTemplateSpec `json:"template,omitempty" protobuf:"bytes,2,opt,name=template"`
 
 	// Restart policy for all replicas within the job.
 	// One of Always, OnFailure, Never and ExitCode.
 	// Default to Never.
-	RestartPolicy RestartPolicy `json:"restartPolicy,omitempty"`
+	RestartPolicy RestartPolicy `json:"restartPolicy,omitempty" protobuf:"bytes,3,opt,name=restartPolicy"`
 }
 
 // +k8s:openapi-gen=true
@@ -92,17 +92,17 @@ type ReplicaSpec struct {
 // JobCondition describes the state of the job at a certain point.
 type JobCondition struct {
 	// Type of job condition.
-	Type JobConditionType `json:"type"`
+	Type JobConditionType `json:"type" protobuf:"bytes,1,opt,name=type"`
 	// Status of the condition, one of True, False, Unknown.
-	Status v1.ConditionStatus `json:"status"`
+	Status v1.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
 	// The reason for the condition's last transition.
-	Reason string `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty" protobuf:"bytes,3,opt,name=reason"`
 	// A human readable message indicating details about the transition.
-	Message string `json:"message,omitempty"`
+	Message string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
 	// The last time this condition was updated.
-	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty" protobuf:"bytes,5,opt,name=lastUpdateTime"`
 	// Last time the condition transitioned from one status to another.
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,6,opt,name=lastTransitionTime"`
 }
 
 // +k8s:openapi-gen=true
@@ -187,26 +187,26 @@ const (
 type RunPolicy struct {
 	// CleanPodPolicy defines the policy to kill pods after the job completes.
 	// Default to Running.
-	CleanPodPolicy *CleanPodPolicy `json:"cleanPodPolicy,omitempty"`
+	CleanPodPolicy *CleanPodPolicy `json:"cleanPodPolicy,omitempty" protobuf:"bytes,1,opt,name=cleanPodPolicy"`
 
 	// TTLSecondsAfterFinished is the TTL to clean up jobs.
 	// It may take extra ReconcilePeriod seconds for the cleanup, since
 	// reconcile gets called periodically.
 	// Default to infinite.
-	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty"`
+	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty" protobuf:"bytes,2,opt,name=ttlSecondsAfterFinished"`
 
 	// Specifies the duration in seconds relative to the startTime that the job may be active
 	// before the system tries to terminate it; value must be positive integer.
 	// +optional
-	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
+	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty" protobuf:"bytes,3,opt,name=activeDeadlineSeconds"`
 
 	// Optional number of retries before marking this job failed.
 	// +optional
-	BackoffLimit *int32 `json:"backoffLimit,omitempty"`
+	BackoffLimit *int32 `json:"backoffLimit,omitempty" protobuf:"bytes,4,opt,name=backoffLimit"`
 
 	// SchedulingPolicy defines the policy related to scheduling, e.g. gang-scheduling
 	// +optional
-	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
+	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty" protobuf:"bytes,5,opt,name=schedulingPolicy"`
 
 	// Suspend specifies whether the Job controller should create Pods or not. If
 	// a Job is created with suspend set to true, no Pods are created by the Job
@@ -218,15 +218,15 @@ type RunPolicy struct {
 	// requires the SuspendJob feature gate to be enabled; otherwise this field
 	// may not be set to true. Defaults to false.
 	// +optional
-	Suspend *bool `json:"suspend,omitempty"`
+	Suspend *bool `json:"suspend,omitempty" protobuf:"bytes,6,opt,name=suspend"`
 }
 
 // +k8s:openapi-gen=true
 // SchedulingPolicy encapsulates various scheduling policies of the distributed training
 // job, for example `minAvailable` for gang-scheduling.
 type SchedulingPolicy struct {
-	MinAvailable  *int32           `json:"minAvailable,omitempty"`
-	Queue         string           `json:"queue,omitempty"`
-	MinResources  *v1.ResourceList `json:"minResources,omitempty"`
-	PriorityClass string           `json:"priorityClass,omitempty"`
+	MinAvailable  *int32           `json:"minAvailable,omitempty" protobuf:"bytes,1,opt,name=minAvailable"`
+	Queue         string           `json:"queue,omitempty" protobuf:"bytes,2,opt,name=queue"`
+	MinResources  *v1.ResourceList `json:"minResources,omitempty" protobuf:"bytes,3,opt,name=minResources"`
+	PriorityClass string           `json:"priorityClass,omitempty" protobuf:"bytes,4,opt,name=priorityClass"`
 }
