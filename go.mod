@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/go-logr/logr v0.3.0
 	github.com/go-openapi/spec v0.20.3
+	github.com/gogo/protobuf v1.3.1
 	github.com/prometheus/client_golang v1.10.0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
