@@ -179,7 +179,6 @@ const (
 	RestartPolicyExitCode RestartPolicy = "ExitCode"
 )
 
-// +protobuf=false
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen=true
 // RunPolicy encapsulates various runtime policies of the distributed training
@@ -222,7 +221,6 @@ type RunPolicy struct {
 	Suspend *bool `json:"suspend,omitempty" protobuf:"bytes,6,opt,name=suspend"`
 }
 
-// +protobuf=false
 // +k8s:openapi-gen=true
 // SchedulingPolicy encapsulates various scheduling policies of the distributed training
 // job, for example `minAvailable` for gang-scheduling.
