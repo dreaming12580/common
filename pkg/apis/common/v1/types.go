@@ -206,7 +206,7 @@ type RunPolicy struct {
 
 	// SchedulingPolicy defines the policy related to scheduling, e.g. gang-scheduling
 	// +optional
-	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
+	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty" protobuf:"bytes,5,opt,name=schedulingPolicy"`
 
 	// Suspend specifies whether the Job controller should create Pods or not. If
 	// a Job is created with suspend set to true, no Pods are created by the Job
@@ -227,6 +227,6 @@ type RunPolicy struct {
 type SchedulingPolicy struct {
 	MinAvailable  *int32           `json:"minAvailable,omitempty" protobuf:"bytes,1,opt,name=minAvailable"`
 	Queue         string           `json:"queue,omitempty" protobuf:"bytes,2,opt,name=queue"`
-	MinResources  *v1.ResourceList `json:"minResources,omitempty" protobuf:"bytes,3,opt,name=minResources"`
+	MinResources  *v1.ResourceList `json:"minResources,omitempty" protobuf:"-"`
 	PriorityClass string           `json:"priorityClass,omitempty" protobuf:"bytes,4,opt,name=priorityClass"`
 }
