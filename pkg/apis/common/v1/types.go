@@ -27,7 +27,7 @@ type JobStatus struct {
 
 	// ReplicaStatuses is map of ReplicaType and ReplicaStatus,
 	// specifies the status of each replica.
-	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses" protobuf:"bytes,2,rep,name=replicaStatuses"`
+	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses" protobuf:"bytes,2,opt,name=replicaStatuses"`
 
 	// Represents time when the job was acknowledged by the job controller.
 	// It is not guaranteed to be set in happens-before order across separate operations.
@@ -179,6 +179,7 @@ const (
 	RestartPolicyExitCode RestartPolicy = "ExitCode"
 )
 
+// +protobuf=false
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen=true
 // RunPolicy encapsulates various runtime policies of the distributed training
@@ -206,7 +207,8 @@ type RunPolicy struct {
 
 	// SchedulingPolicy defines the policy related to scheduling, e.g. gang-scheduling
 	// +optional
-	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
+	// +protobuf=false
+	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty" protobuf:""`
 
 	// Suspend specifies whether the Job controller should create Pods or not. If
 	// a Job is created with suspend set to true, no Pods are created by the Job
@@ -221,12 +223,14 @@ type RunPolicy struct {
 	Suspend *bool `json:"suspend,omitempty" protobuf:"bytes,6,opt,name=suspend"`
 }
 
+// +protobuf=false
 // +k8s:openapi-gen=true
 // SchedulingPolicy encapsulates various scheduling policies of the distributed training
 // job, for example `minAvailable` for gang-scheduling.
 type SchedulingPolicy struct {
 	MinAvailable  *int32           `json:"minAvailable,omitempty" protobuf:"bytes,1,opt,name=minAvailable"`
 	Queue         string           `json:"queue,omitempty" protobuf:"bytes,2,opt,name=queue"`
+	// +protobuf=false
 	MinResources  *v1.ResourceList `json:"minResources,omitempty" protobuf:"bytes,3,opt,name=minResources"`
 	PriorityClass string           `json:"priorityClass,omitempty" protobuf:"bytes,4,opt,name=priorityClass"`
 }

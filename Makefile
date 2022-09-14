@@ -44,6 +44,13 @@ $(GOPATH)/bin/swagger:
 $(GOPATH)/bin/goimports:
 	go install golang.org/x/tools/cmd/goimports@v0.1.7
 
+/usr/local/bin/clang-format:
+ifeq ($(shell uname),Darwin)
+	brew install clang-format
+else
+	sudo apt-get install clang-format
+endif
+
 
 pkg/apis/common/v1/generated.proto: $(GOPATH)/bin/go-to-protobuf $(PROTO_BINARIES) $(TYPES) $(GOPATH)/src/github.com/gogo/protobuf
 	# These files are generated on a v3/ folder by the tool. Link them to the root folder
@@ -52,9 +59,10 @@ pkg/apis/common/v1/generated.proto: $(GOPATH)/bin/go-to-protobuf $(PROTO_BINARIE
 	# [ -e ./vendor ] || go mod vendor
 
 	$(GOPATH)/bin/go-to-protobuf \
+		--drop-embedded-fields=github.com/kubeflow/common/pkg/apis/common/v1.SchedulingPolicy \
 		--go-header-file=./hack/boilerplate/boilerplate.go.txt  \
+		--apimachinery-packages=+k8s.io/apimachinery/pkg/util/intstr,+k8s.io/apimachinery/pkg/api/resource,+k8s.io/apimachinery/pkg/runtime/schema,+k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/apis/meta/v1beta1,k8s.io/api/core/v1,k8s.io/api/policy/v1beta1 \
 		--packages=github.com/kubeflow/common/pkg/apis/common/v1 \
-		--apimachinery-packages=+k8s.io/apimachinery/pkg/util/intstr,+k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/runtime/schema,+k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/api/core/v1,k8s.io/api/policy/v1beta1 \
 		--proto-import $(GOPATH)/src
 	# Delete the link
 	touch pkg/apis/common/v1/generated.proto
