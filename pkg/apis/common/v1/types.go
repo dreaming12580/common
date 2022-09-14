@@ -27,7 +27,7 @@ type JobStatus struct {
 
 	// ReplicaStatuses is map of ReplicaType and ReplicaStatus,
 	// specifies the status of each replica.
-	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses" protobuf:"bytes,2,rep,name=replicaStatuses"`
+	ReplicaStatuses map[ReplicaType]*ReplicaStatus `json:"replicaStatuses" protobuf:"bytes,2,opt,name=replicaStatuses"`
 
 	// Represents time when the job was acknowledged by the job controller.
 	// It is not guaranteed to be set in happens-before order across separate operations.
@@ -179,6 +179,7 @@ const (
 	RestartPolicyExitCode RestartPolicy = "ExitCode"
 )
 
+// +protobuf=false
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen=true
 // RunPolicy encapsulates various runtime policies of the distributed training
@@ -221,6 +222,7 @@ type RunPolicy struct {
 	Suspend *bool `json:"suspend,omitempty" protobuf:"bytes,6,opt,name=suspend"`
 }
 
+// +protobuf=false
 // +k8s:openapi-gen=true
 // SchedulingPolicy encapsulates various scheduling policies of the distributed training
 // job, for example `minAvailable` for gang-scheduling.
