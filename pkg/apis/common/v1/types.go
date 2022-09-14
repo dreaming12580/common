@@ -206,7 +206,7 @@ type RunPolicy struct {
 
 	// SchedulingPolicy defines the policy related to scheduling, e.g. gang-scheduling
 	// +optional
-	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty" protobuf:"bytes,5,opt,name=schedulingPolicy"`
+	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
 
 	// Suspend specifies whether the Job controller should create Pods or not. If
 	// a Job is created with suspend set to true, no Pods are created by the Job
@@ -221,10 +221,6 @@ type RunPolicy struct {
 	Suspend *bool `json:"suspend,omitempty" protobuf:"bytes,6,opt,name=suspend"`
 }
 
-// +protobuf=true
-// +protobuf.embed=string
-// +protobuf.options.marshal=false
-// +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:openapi-gen=true
 // SchedulingPolicy encapsulates various scheduling policies of the distributed training
 // job, for example `minAvailable` for gang-scheduling.
